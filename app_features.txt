@@ -1,0 +1,48 @@
+database
+--------
+1. create user database for authentication
+
+
+
+
+
+signup router
+-------------
+0. connect to db
+1. perform data validation
+	-check email password formats/length
+	-verify email is not already used
+2. encrypt/hash password
+//3. generate refresh token
+4. write user to database[email, password, refresh token]
+5. generate access token
+//6. generate id token
+7. construct user context [has user data, access token]
+8. return user context + access token in httpOnly cookie
+
+
+signin router
+-------------
+0. connect to db
+1. verify email and password exist
+2. generate access token
+3. construct user context [has user data, access token]
+4. return user context + access token in httpOnly cookie
+5. for signout, clear cookie
+
+
+token router
+------------
+1. verify if access token cookie is present
+2. verify if token is valid
+3. verify if token is expired, then renew
+
+
+
+
+TODO
+1.implement hardened cookie(samesite, secure, httponly); implement tls
+
+
+App Flow
+########
