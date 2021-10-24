@@ -14,11 +14,11 @@ export const signupRouter = express.Router()
 
 //MIDDLEWARES
 //
-//connect to db
-signupRouter.use((req, res, next) => {
-    connectDb()
-    next()
-})
+// //connect to db      MONGODB
+// signupRouter.use((req, res, next) => {
+//     connectDb()
+//     next()
+// })
 
 //parse request body as json
 signupRouter.use(express.json())
@@ -37,60 +37,66 @@ signupRouter.use(cookieParser())
 signupRouter.post('/signup', async (req, res) => {
     //TODO: validate input data eg. email format, password length, etc
 
+    const { email, password, firstName, lastName } = req.body
+
     //verify email is not already in use
-    const data = await User.findOne({ email: req.body.email })
-    const data2 = await db.query('SELECT * FROM Person WHERE email=$1',['mail2'])
-    console.log(data2.rows[0])
-    console.log(data)
-    if (data) {
-        res.status(400).send({ status: "error", message : 'user exists' })
+    //const data = await User.findOne({ email: req.body.email })// MONGO
+    const data = await db.query('SELECT * FROM Person WHERE email=$1', [email])
+
+    //if (data) { //MONGO
+    if (data.rows[0]) {
+        res.status(400).send({ status: "error", message: 'user exists' })
         return
     }
     //generate password hash
     const salt = await bcrypt.genSalt(10)
-    const passwordHash = await bcrypt.hash(req.body.password, salt)
-
-    //generate refresh token
-    //const refreshToken = randtoken.generate(20)
+    const passwordHash = await bcrypt.hash(password, salt)
 
     try {
-        //create user with refresh token
-        const user = await User.create({
-            ...req.body,
-            password: passwordHash,
-            //refreshToken: refreshToken
-        })
+        //create user 
+        // const user = await User.create({     // MONGODB
+        //     ...req.body,
+        //     password: passwordHash,
+        // })
+
+        await db.query('INSERT INTO Person (email,userpassword,firstname,lastname) VALUES ($1,$2,$3,$4)', [email, passwordHash, firstName, lastName])
+        const user = await db.query('SELECT * FROM Person WHERE email=$1', [req.body.email])
 
         //generate JWT access token
         const accessToken = await jwt.sign({
-            email: user.email,
-            userId: user._id
-        }, process.env.ACCESS_TOKEN_SECRET, { 
+            userId: user.rows[0].userid,
+            email: user.rows[0].email,
+            firstName: user.rows[0].firstname,
+            lastName: user.rows[0].lastname,
+            //userId: user._id  // MONGO
+        }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: 30,
             algorithm: 'HS512'
-         })
+        })
 
-         //TODO: Genereate id token
-        
+        //TODO: Genereate id token
+
         //construct user context
         const userContext = {
-            userId: user._id,
-            email: req.body.email,
+            //userId: user._id,     // MONGODH
+            userId: user.rows[0].userid,
+            email: user.rows[0].email,
+            firstName: user.rows[0].firstname,
+            lastName: user.rows[0].lastname,
             accessToken,
-            //refreshToken
         }
 
         //add access token in httponly cookie
-        res.cookie('accessToken',accessToken,{
+        res.cookie('accessToken', accessToken, {
             httpOnly: true,
             maxAge: 10000000
         })
 
         //send response
-        res.status(201).send({status: "success", data: userContext})
+        res.status(201).send({ status: "success", data: userContext })
     } catch (error) {
         console.log(error)
-        res.status(500).send({ status: "error", message : 'write failed' })
+        res.status(500).send({ status: "error", message: 'write failed' })
     }
 
 })

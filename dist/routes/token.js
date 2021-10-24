@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tokenRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const connectDb_1 = __importDefault(require("../models/connectDb"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require('dotenv').config();
 const cors_1 = __importDefault(require("cors"));
@@ -23,12 +22,11 @@ const jwt_decode_1 = __importDefault(require("jwt-decode"));
 exports.tokenRouter = express_1.default.Router();
 //MIDDLEWARES
 //
-//connect to db
-exports.tokenRouter.use((req, res, next) => {
-    //console.log('from token')
-    (0, connectDb_1.default)();
-    next();
-});
+// //connect to db      //MONGODB
+// tokenRouter.use((req, res, next) => {
+//     connectDb();
+//     next()
+// })
 //parse request body
 exports.tokenRouter.use(express_1.default.json());
 //enable CORS
@@ -54,6 +52,8 @@ exports.tokenRouter.get('/token/verify', (req, res) => __awaiter(void 0, void 0,
         const userContext = {
             userId: x.userId,
             email: x.email,
+            firstName: x.firstName,
+            lastName: x.lastName,
             accessToken: accessToken
         };
         res.status(200).send({ status: "success", data: userContext });
@@ -67,6 +67,8 @@ exports.tokenRouter.get('/token/verify', (req, res) => __awaiter(void 0, void 0,
             const newAccessToken = yield jsonwebtoken_1.default.sign({
                 email: decoded.email,
                 userId: decoded.userId,
+                firstName: decoded.firstName,
+                lastName: decoded.lastName
             }, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: 30,
                 algorithm: 'HS512'

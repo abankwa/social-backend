@@ -16,16 +16,64 @@ postRouter.use(cors({
 //parse cookies
 postRouter.use(cookieParser())
 
+//parse request body as json
+postRouter.use(express.json())
 
-postRouter.get('/posts', isUserAuthenticated, async (req, res) => {
-
+//GET ALL POSTS BY USER
+//postRouter.get('/posts', isUserAuthenticated, async (req, res) => {
+postRouter.get('/user/:userId/posts', async (req, res) => {
     try {
-        const data = await db.query('SELECT * FROM table1',[])
-        console.log(data.rows)
-        res.status(200).send({status: 'success', data: data})
-    } catch (err){
-        console.log(err)
-        res.status(500).send({status: 'error', error:err})
+        const data = await db.query('SELECT * FROM Post WHERE personid = $1', [req.params.userId])
+        res.status(200).send({ status: 'success', data: data.rows })
+    } catch (err) {
+        res.status(500).send({ status: 'error', error: err })
     }
 
 })
+
+//GET POST BY ID
+postRouter.get('/posts/:postId', async (req, res) => {
+    try {
+        const {postId} = req.params
+        const data = await db.query('SELECT * FROM Post WHERE PostId = $1',[postId])
+        res.status(200).send({data: data.rows})
+    } catch (err){
+        res.status(500).send({status: 'error', message: err})
+    }
+})
+
+//CREATE POST
+//postRouter.post('/post', isUserAuthenticated, async (req, res) => {
+postRouter.post('/post', async (req, res) => {
+    try {
+        const { postText, personId, mediaURL } = req.body
+        const data = await db.query('INSERT INTO Post (postText, personId, mediaUrl) VALUES ($1,$2,$3)', [postText, personId, mediaURL])
+        res.status(201).send({ status: 'success' })
+        console.log('success')
+    } catch (error) {
+        res.status(500).send({ status: 'error', error })
+        console.log(error)
+    }
+
+    //TODO: determine personId before inserting into Post
+})
+
+//DELETE POST BY USER
+//postRouter.post('/post', isUserAuthenticated, async (req, res) => {
+postRouter.delete('/post', async (req, res) => {
+    try {
+        const { personid, postid} = req.body
+        console.log(req.body)
+        const data = await db.query('DELETE FROM Post WHERE postid=$1 AND personid=$2',[postid,personid])
+        res.status(200).send({status: 'success'})
+    } catch(error){
+        console.log(error)
+        res.status(500).send({status: 'error'})
+    }
+})
+
+//UPDATE POST BY USER
+
+//GET USER FEED
+//use some algo to determine what posts from user's friend's or content subscriptions to show 
+//on their feed

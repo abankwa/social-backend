@@ -1,8 +1,5 @@
 import express from 'express'
 import connectDb from '../models/connectDb'
-import User from '../models/usersModel'
-import bcrypt from 'bcrypt'
-import randtoken from 'rand-token'
 import jwt from 'jsonwebtoken'
 require('dotenv').config()
 import cors from 'cors'
@@ -13,12 +10,11 @@ export const tokenRouter = express.Router()
 
 //MIDDLEWARES
 //
-//connect to db
-tokenRouter.use((req, res, next) => {
-    //console.log('from token')
-    connectDb();
-    next()
-})
+// //connect to db      //MONGODB
+// tokenRouter.use((req, res, next) => {
+//     connectDb();
+//     next()
+// })
 
 //parse request body
 tokenRouter.use(express.json())
@@ -53,8 +49,11 @@ tokenRouter.get('/token/verify', async (req, res) => {
         const userContext = {
             userId: x.userId,
             email: x.email,
+            firstName: x.firstName,
+            lastName: x.lastName,
             accessToken: accessToken
         }
+
 
         res.status(200).send({ status: "success", data: userContext })
 
@@ -70,6 +69,8 @@ tokenRouter.get('/token/verify', async (req, res) => {
             const newAccessToken = await jwt.sign({
                 email: decoded.email,
                 userId: decoded.userId,
+                firstName: decoded.firstName,
+                lastName: decoded.lastName
             }, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: 30,
                 algorithm: 'HS512'

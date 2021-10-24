@@ -11,12 +11,11 @@ export const signInRouter = express.Router()
 
 //MIDDLEWARES
 //
-//connect to db
-signInRouter.use((req, res, next) => {
-    //console.log('from sign in')
-    connectDb()
-    next()
-})
+// //connect to db
+// signInRouter.use((req, res, next) => {
+//     connectDb()
+//     next()
+// })
 
 //parse request body as json
 signInRouter.use(express.json())
@@ -31,20 +30,25 @@ signInRouter.post('/signin', async (req, res) => {
     try {
         //verify user email exists
 
-        const user = await User.findOne({email: req.body.email})
-        
-        if(!user) res.status(401).send({status: "error" ,message : "user not found"})
+        //const user = await User.findOne({email: req.body.email}) MONGODB
 
-    
+        const user = await db.query('SELECT * FROM Person WHERE email=$1',[req.body.email])
+        
+        if(!user.rows[0]) res.status(401).send({status: "error" ,message : "user not found"})
+
         //verify password
-        const isPasswordSame = await bcrypt.compare(req.body.password, user.password)
+        const isPasswordSame = await bcrypt.compare(req.body.password, user.rows[0].userpassword)
 
         if(isPasswordSame) {
 
             //generate JWT access token
             const accessToken = await jwt.sign({
-                email: user.email,
-                userId: user._id
+                //email: user.email, MONGODB
+               // userId: user._id MONGODB
+               userId: user.rows[0].userid,
+               email: user.rows[0].email,
+               firstName: user.rows[0].firstname,
+               lastName: user.rows[0].lastname,
             }, process.env.ACCESS_TOKEN_SECRET, { 
                 expiresIn: 30,
                 algorithm: 'HS512'
@@ -52,8 +56,11 @@ signInRouter.post('/signin', async (req, res) => {
 
             //construct user context
             const userContext = {
-                userId: user._id,
-                email: req.body.email,
+                //userId: user._id, MONGODB
+                userId: user.rows[0].userid,
+                email: user.rows[0].email,
+                firstName: user.rows[0].firstname,
+                lastName: user.rows[0].lastname,
                 accessToken
             }
 

@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signupRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const connectDb_1 = __importDefault(require("../models/connectDb"));
-const usersModel_1 = __importDefault(require("../models/usersModel"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require('dotenv').config();
@@ -25,11 +23,11 @@ const postgresDb_1 = __importDefault(require("../models/postgresDb"));
 exports.signupRouter = express_1.default.Router();
 //MIDDLEWARES
 //
-//connect to db
-exports.signupRouter.use((req, res, next) => {
-    (0, connectDb_1.default)();
-    next();
-});
+// //connect to db      MONGODB
+// signupRouter.use((req, res, next) => {
+//     connectDb()
+//     next()
+// })
 //parse request body as json
 exports.signupRouter.use(express_1.default.json());
 //enable CORS
@@ -41,27 +39,33 @@ exports.signupRouter.use((0, cors_1.default)({
 exports.signupRouter.use((0, cookie_parser_1.default)());
 exports.signupRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //TODO: validate input data eg. email format, password length, etc
+    const { email, password, firstName, lastName } = req.body;
     //verify email is not already in use
-    const data = yield usersModel_1.default.findOne({ email: req.body.email });
-    const data2 = yield postgresDb_1.default.query('SELECT * FROM Person WHERE email=$1', ['mail2']);
-    console.log(data2.rows[0]);
-    console.log(data);
-    if (data) {
+    //const data = await User.findOne({ email: req.body.email })// MONGO
+    const data = yield postgresDb_1.default.query('SELECT * FROM Person WHERE email=$1', [email]);
+    //if (data) { //MONGO
+    if (data.rows[0]) {
         res.status(400).send({ status: "error", message: 'user exists' });
         return;
     }
     //generate password hash
     const salt = yield bcrypt_1.default.genSalt(10);
-    const passwordHash = yield bcrypt_1.default.hash(req.body.password, salt);
-    //generate refresh token
-    //const refreshToken = randtoken.generate(20)
+    const passwordHash = yield bcrypt_1.default.hash(password, salt);
     try {
-        //create user with refresh token
-        const user = yield usersModel_1.default.create(Object.assign(Object.assign({}, req.body), { password: passwordHash }));
+        //create user 
+        // const user = await User.create({     // MONGODB
+        //     ...req.body,
+        //     password: passwordHash,
+        // })
+        yield postgresDb_1.default.query('INSERT INTO Person (email,userpassword,firstname,lastname) VALUES ($1,$2,$3,$4)', [email, passwordHash, firstName, lastName]);
+        const user = yield postgresDb_1.default.query('SELECT * FROM Person WHERE email=$1', [req.body.email]);
         //generate JWT access token
         const accessToken = yield jsonwebtoken_1.default.sign({
-            email: user.email,
-            userId: user._id
+            userId: user.rows[0].userid,
+            email: user.rows[0].email,
+            firstName: user.rows[0].firstname,
+            lastName: user.rows[0].lastname,
+            //userId: user._id  // MONGO
         }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: 30,
             algorithm: 'HS512'
@@ -69,10 +73,12 @@ exports.signupRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, voi
         //TODO: Genereate id token
         //construct user context
         const userContext = {
-            userId: user._id,
-            email: req.body.email,
+            //userId: user._id,     // MONGODH
+            userId: user.rows[0].userid,
+            email: user.rows[0].email,
+            firstName: user.rows[0].firstname,
+            lastName: user.rows[0].lastname,
             accessToken,
-            //refreshToken
         };
         //add access token in httponly cookie
         res.cookie('accessToken', accessToken, {
