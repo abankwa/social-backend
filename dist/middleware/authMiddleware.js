@@ -12,26 +12,55 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isUserAuthenticated = void 0;
+exports.verifyUserAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require('dotenv').config();
+const jwt_decode_1 = __importDefault(require("jwt-decode"));
 //verify user is authenticated before accessing protected routes
-function isUserAuthenticated(req, res, next) {
+//verify and/or renew token
+function verifyUserAuth(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const token = req.cookies.accessToken;
-        if (token) {
-            try {
-                yield jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_SECRET);
-                next();
-            }
-            catch (error) {
-                res.status(401).send({ status: 'unauthorized', message: error });
-            }
+        //absent token; deny; early exit
+        if (typeof (req.cookies['accessToken']) === 'undefined') {
+            res.status(400).send({ status: "error", message: 'missing token' });
+            return;
         }
-        else {
-            //token does not exist; early exit
-            res.status(401).send({ status: 'error', message: 'absent token' });
+        //valid token; continue
+        try {
+            const accessToken = yield req.cookies['accessToken'];
+            const verified = yield jsonwebtoken_1.default.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+            next();
+            //expired token. renew token, set cookie and continue. no need to send user context here.
+            //TODO: consider changing this logic. instead of automatically renewing expired token, 
+            //deny instead to force user to relogin.
+        }
+        catch (error) {
+            //renew expired token
+            if (error.name === 'TokenExpiredError') {
+                // decode token
+                const decoded = (0, jwt_decode_1.default)(req.cookies['accessToken']);
+                //generate new token
+                const newAccessToken = yield jsonwebtoken_1.default.sign({
+                    email: decoded.email,
+                    userId: decoded.userId,
+                    firstName: decoded.firstName,
+                    lastName: decoded.lastName
+                }, process.env.ACCESS_TOKEN_SECRET, {
+                    expiresIn: 30,
+                    algorithm: 'HS512'
+                });
+                //add access token in httponly cookie
+                res.cookie('accessToken', newAccessToken, {
+                    httpOnly: true,
+                    maxAge: 1000000
+                });
+                next();
+                // invalid token; deny
+            }
+            else {
+                res.status(400).send({ status: "error", message: "invalid token" });
+            }
         }
     });
 }
-exports.isUserAuthenticated = isUserAuthenticated;
+exports.verifyUserAuth = verifyUserAuth;

@@ -40,6 +40,7 @@ exports.signupRouter.use((0, cookie_parser_1.default)());
 exports.signupRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //TODO: validate input data eg. email format, password length, etc
     const { email, password, firstName, lastName } = req.body;
+    console.log(req.body);
     //verify email is not already in use
     //const data = await User.findOne({ email: req.body.email })// MONGO
     const data = yield postgresDb_1.default.query('SELECT * FROM Person WHERE email=$1', [email]);
@@ -49,8 +50,15 @@ exports.signupRouter.post('/signup', (req, res) => __awaiter(void 0, void 0, voi
         return;
     }
     //generate password hash
-    const salt = yield bcrypt_1.default.genSalt(10);
-    const passwordHash = yield bcrypt_1.default.hash(password, salt);
+    let passwordHash;
+    try {
+        const salt = yield bcrypt_1.default.genSalt(10);
+        passwordHash = yield bcrypt_1.default.hash(password, salt);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send({ status: 'error', message: error });
+    }
     try {
         //create user 
         // const user = await User.create({     // MONGODB

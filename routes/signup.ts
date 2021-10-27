@@ -37,8 +37,10 @@ signupRouter.use(cookieParser())
 signupRouter.post('/signup', async (req, res) => {
     //TODO: validate input data eg. email format, password length, etc
 
+    
     const { email, password, firstName, lastName } = req.body
 
+    console.log(req.body)
     //verify email is not already in use
     //const data = await User.findOne({ email: req.body.email })// MONGO
     const data = await db.query('SELECT * FROM Person WHERE email=$1', [email])
@@ -49,8 +51,15 @@ signupRouter.post('/signup', async (req, res) => {
         return
     }
     //generate password hash
-    const salt = await bcrypt.genSalt(10)
-    const passwordHash = await bcrypt.hash(password, salt)
+    let passwordHash
+    try {
+        const salt = await bcrypt.genSalt(10)
+        passwordHash = await bcrypt.hash(password, salt)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({status: 'error', message: error})
+    }
+    
 
     try {
         //create user 

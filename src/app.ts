@@ -6,6 +6,7 @@ import  { signupRouter } from '../routes/signup'
 import { signInRouter } from '../routes/signin'
 import { tokenRouter } from '../routes/token'
 import { postRouter } from '../routes/post'
+import { mediaRouter } from '../routes/media'
 
 //connect to db
 connectDb();
@@ -21,6 +22,9 @@ app.use('/auth', signupRouter)
 app.use('/auth', signInRouter)
 
 app.use('/auth', tokenRouter)
+
+app.use('/auth', mediaRouter)
+
 
 // start server
 app.listen(port, ()=>{

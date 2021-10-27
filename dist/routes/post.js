@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const postgresDb_1 = __importDefault(require("../models/postgresDb"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const awsS3_1 = require("../middleware/awsS3");
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 exports.postRouter = express_1.default.Router();
@@ -28,10 +30,10 @@ exports.postRouter.use((0, cookie_parser_1.default)());
 //parse request body as json
 exports.postRouter.use(express_1.default.json());
 //GET ALL POSTS BY USER
-//postRouter.get('/posts', isUserAuthenticated, async (req, res) => {
-exports.postRouter.get('/user/:userId/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postRouter.get('/user/:userId/posts', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //postRouter.get('/user/:userId/posts', async (req, res) => {
     try {
-        const data = yield postgresDb_1.default.query('SELECT * FROM Post WHERE personid = $1', [req.params.userId]);
+        const data = yield postgresDb_1.default.query('SELECT * FROM Post WHERE personid = $1 ORDER BY postdate DESC', [req.params.userId]);
         res.status(200).send({ status: 'success', data: data.rows });
     }
     catch (err) {
@@ -39,7 +41,7 @@ exports.postRouter.get('/user/:userId/posts', (req, res) => __awaiter(void 0, vo
     }
 }));
 //GET POST BY ID
-exports.postRouter.get('/posts/:postId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postRouter.get('/posts/:postId', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { postId } = req.params;
         const data = yield postgresDb_1.default.query('SELECT * FROM Post WHERE PostId = $1', [postId]);
@@ -50,8 +52,8 @@ exports.postRouter.get('/posts/:postId', (req, res) => __awaiter(void 0, void 0,
     }
 }));
 //CREATE POST
-//postRouter.post('/post', isUserAuthenticated, async (req, res) => {
-exports.postRouter.post('/post', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postRouter.post('/post', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //postRouter.post('/post', async (req, res) => {
     try {
         const { postText, personId, mediaURL } = req.body;
         const data = yield postgresDb_1.default.query('INSERT INTO Post (postText, personId, mediaUrl) VALUES ($1,$2,$3)', [postText, personId, mediaURL]);
@@ -65,19 +67,23 @@ exports.postRouter.post('/post', (req, res) => __awaiter(void 0, void 0, void 0,
     //TODO: determine personId before inserting into Post
 }));
 //DELETE POST BY USER
-//postRouter.post('/post', isUserAuthenticated, async (req, res) => {
-exports.postRouter.delete('/post', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postRouter.delete('/post', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //postRouter.delete('/post', async (req, res) => {
     try {
+        //delete post from database
         const { personid, postid } = req.body;
         console.log(req.body);
         const data = yield postgresDb_1.default.query('DELETE FROM Post WHERE postid=$1 AND personid=$2', [postid, personid]);
+        //delete image from S3 
+        const out = (0, awsS3_1.deleteS3Object)(req.body.mediaurl.split('/')[3]);
         res.status(200).send({ status: 'success' });
     }
     catch (error) {
         console.log(error);
-        res.status(500).send({ status: 'error' });
+        res.status(500).send({ status: 'error', error });
     }
 }));
-//GET NEW FEED
-//use some algo to determine what posts from user's friend's or subscription to show 
+//UPDATE POST BY USER
+//GET USER FEED
+//use some algo to determine what posts from user's friend's or content subscriptions to show 
 //on their feed

@@ -60,6 +60,8 @@ tokenRouter.get('/token/verify', async (req, res) => {
     } catch (error) {
 
         //renew expired token
+        //TODO: consider changing this logic. instead of automatically renewing expired token, 
+        //deny instead to force user to relogin.
         if (error.name === 'TokenExpiredError') {
 
             // decode token
@@ -78,6 +80,8 @@ tokenRouter.get('/token/verify', async (req, res) => {
 
             //construct user context
             const userContext = {
+                firstName: decoded.firstName,
+                lastName: decoded.lastName,
                 userId: decoded.userId,
                 email: decoded.email,
                 accessToken: newAccessToken

@@ -60,6 +60,8 @@ exports.tokenRouter.get('/token/verify', (req, res) => __awaiter(void 0, void 0,
     }
     catch (error) {
         //renew expired token
+        //TODO: consider changing this logic. instead of automatically renewing expired token, 
+        //deny instead to force user to relogin.
         if (error.name === 'TokenExpiredError') {
             // decode token
             const decoded = (0, jwt_decode_1.default)(req.cookies['accessToken']);
@@ -75,6 +77,8 @@ exports.tokenRouter.get('/token/verify', (req, res) => __awaiter(void 0, void 0,
             });
             //construct user context
             const userContext = {
+                firstName: decoded.firstName,
+                lastName: decoded.lastName,
                 userId: decoded.userId,
                 email: decoded.email,
                 accessToken: newAccessToken
