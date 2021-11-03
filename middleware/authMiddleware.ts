@@ -15,6 +15,12 @@ export  async function  verifyUserAuth(req, res, next){
         return    
     }
 
+    // decode token to and add to request as userContext. ensures all protected routes know the 
+    // user making requests
+    const decoded = jwtDecode(req.cookies['accessToken'])
+    req.userContext = decoded
+
+
     //valid token; continue
     try {
         const accessToken = await req.cookies['accessToken']
@@ -29,9 +35,6 @@ export  async function  verifyUserAuth(req, res, next){
         //renew expired token
         if (error.name === 'TokenExpiredError') {
 
-            // decode token
-            const decoded = jwtDecode(req.cookies['accessToken'])
-
             //generate new token
             const newAccessToken = await jwt.sign({
                 email: decoded.email,
@@ -43,6 +46,8 @@ export  async function  verifyUserAuth(req, res, next){
                 algorithm: 'HS512'
             })
 
+            //add userId to req. allows accessing userId by routes
+            res.userId = decoded.userId
 
             //add access token in httponly cookie
             res.cookie('accessToken', newAccessToken, {

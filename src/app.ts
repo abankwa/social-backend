@@ -7,6 +7,8 @@ import { signInRouter } from '../routes/signin'
 import { tokenRouter } from '../routes/token'
 import { postRouter } from '../routes/post'
 import { mediaRouter } from '../routes/media'
+import { searchRouter } from '../routes/search'
+import { friendRouter} from '../routes/friend'
 
 //connect to db
 connectDb();
@@ -25,6 +27,9 @@ app.use('/auth', tokenRouter)
 
 app.use('/auth', mediaRouter)
 
+app.use('/api', searchRouter)
+
+app.use('/api', friendRouter)
 
 // start server
 app.listen(port, ()=>{

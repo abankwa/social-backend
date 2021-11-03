@@ -25,6 +25,10 @@ function verifyUserAuth(req, res, next) {
             res.status(400).send({ status: "error", message: 'missing token' });
             return;
         }
+        // decode token to and add to request as userContext. ensures all protected routes know the 
+        // user making requests
+        const decoded = (0, jwt_decode_1.default)(req.cookies['accessToken']);
+        req.userContext = decoded;
         //valid token; continue
         try {
             const accessToken = yield req.cookies['accessToken'];
@@ -37,8 +41,6 @@ function verifyUserAuth(req, res, next) {
         catch (error) {
             //renew expired token
             if (error.name === 'TokenExpiredError') {
-                // decode token
-                const decoded = (0, jwt_decode_1.default)(req.cookies['accessToken']);
                 //generate new token
                 const newAccessToken = yield jsonwebtoken_1.default.sign({
                     email: decoded.email,
@@ -49,6 +51,8 @@ function verifyUserAuth(req, res, next) {
                     expiresIn: 30,
                     algorithm: 'HS512'
                 });
+                //add userId to req. allows accessing userId by routes
+                res.userId = decoded.userId;
                 //add access token in httponly cookie
                 res.cookie('accessToken', newAccessToken, {
                     httpOnly: true,

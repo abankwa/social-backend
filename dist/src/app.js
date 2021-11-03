@@ -11,6 +11,8 @@ const signin_1 = require("../routes/signin");
 const token_1 = require("../routes/token");
 const post_1 = require("../routes/post");
 const media_1 = require("../routes/media");
+const search_1 = require("../routes/search");
+const friend_1 = require("../routes/friend");
 //connect to db
 (0, connectDb_1.default)();
 console.log('from app');
@@ -21,6 +23,8 @@ app.use('/auth', signup_1.signupRouter);
 app.use('/auth', signin_1.signInRouter);
 app.use('/auth', token_1.tokenRouter);
 app.use('/auth', media_1.mediaRouter);
+app.use('/api', search_1.searchRouter);
+app.use('/api', friend_1.friendRouter);
 // start server
 app.listen(port, () => {
     console.log(`running on port ${port}`);
