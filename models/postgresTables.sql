@@ -21,11 +21,14 @@ CREATE TABLE Friend (
     CONSTRAINT user_friend_id PRIMARY KEY (userid, friendid)
 );
 -- FRIEND REQUEST TABLE
-CREATE TABLE FriendRequestd (
+CREATE TABLE FriendRequest (
     requesterid int NOT NULL REFERENCES Person(userId),
     receiverid int NOT NULL REFERENCES Person(userId),
+    requestdate TIMESTAMP DEFAULT NOW(),
     CONSTRAINT requester_receiver_id PRIMARY KEY (userid, friendid)
 )
+
+
 
 
 --==================

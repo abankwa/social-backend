@@ -32,7 +32,7 @@ exports.searchRouter.get('/live-search/:searchKey', (req, res) => __awaiter(void
     const key = req.params.searchKey.trim();
     try {
         //TODO: search from user's friend list first before global users
-        const data = yield postgresDb_1.default.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 5`, [`%${key}%`]);
+        const data = yield postgresDb_1.default.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
         res.send({ status: 'success', data: data.rows });
         //TODO: code search order for live search. 
         //first friends' firstname, then lastname, then other people etc.

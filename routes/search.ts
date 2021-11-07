@@ -30,7 +30,7 @@ searchRouter.get('/live-search/:searchKey', async (req, res) => {
 
         //TODO: search from user's friend list first before global users
         
-        const data = await db.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 5`, [`%${key}%`])
+        const data = await db.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
         
         res.send({ status: 'success', data: data.rows })
 
