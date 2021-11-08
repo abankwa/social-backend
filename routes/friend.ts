@@ -36,8 +36,6 @@ friendRouter.get('/verify-friend/:friendId', verifyUserAuth, async (req, res) =>
     try {
         const data = await db.query('SELECT * FROM friend where userid=(LEAST($1,$2))::INT and friendid=(GREATEST($1,$2))::INT',[userid,friendid])
         data.rows.length > 0 ? isFriend = true : isFriend = false ;
-        console.log(`userid: ${userid}  friendid: ${friendid}`)
-        console.log(`res ${data.rows}`)
     } catch (error) {
         res.status(500).send({status : "error", message:error})
     }
@@ -128,6 +126,20 @@ friendRouter.post('/request-friend/:friendId', verifyUserAuth, async (req, res) 
 
 })
 
+
+//GET FRIEND REQUESTS + Sender details
+friendRouter.get('/friend-requests', verifyUserAuth, async (req, res) => {
+    const userid = req.userContext.userId
+
+    try {
+        const data = await db.query('SELECT person.firstname, person.lastname,person.userid FROM friendrequest INNER JOIN person ON friendrequest.requesterid = person.userid WHERE friendrequest.receiverid = $1',[userid]);
+        res.status(200).send({status: 'success', data:data.rows})
+    } catch (error) {
+        res.status(500).send({status: 'error', message: error})
+    }
+
+})
+
 //GET FRIEND DATA
 friendRouter.get('/friend/:friendId', verifyUserAuth, async (req, res) => {
 
@@ -144,15 +156,16 @@ friendRouter.get('/friend/:friendId', verifyUserAuth, async (req, res) => {
 
 })
 
+//GET ALL FRIENDS 
+friendRouter.get('/friends', verifyUserAuth, async (req, res) => {
 
-//GET FRIEND REQUESTS + Sender details
-friendRouter.get('/friend-requests', verifyUserAuth, async (req, res) => {
+
     const userid = req.userContext.userId
-
+    
     try {
-        const data = await db.query('SELECT person.firstname, person.lastname,person.userid FROM friendrequest INNER JOIN person ON friendrequest.requesterid = person.userid WHERE friendrequest.receiverid = $1',[userid]);
-        res.status(200).send({status: 'success', data:data.rows})
-        console.log(data)
+        const data = await db.query('SELECT person.email, person.firstname, person.lastname, person.userid FROM friend INNER JOIN person ON friend.friendid = person.userid WHERE friend.userid = $1',[userid])
+        console.log(data.rows)
+        res.status(200).send({status: 'success', data:data.rows })
     } catch (error) {
         res.status(500).send({status: 'error', message: error})
     }

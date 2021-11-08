@@ -21,28 +21,41 @@ searchRouter.use(cookieParser())
 searchRouter.use(express.json())
 
 
-//LIVE SEARCH RESULTS; while person types
-searchRouter.get('/live-search/:searchKey', async (req, res) => {
+//GLOBAL LIVE SEARCH RESULTS; while person types
+searchRouter.get('/global-search/:searchKey', async (req, res) => {
 
     const key = req.params.searchKey.trim()
 
     try {
-
-        //TODO: search from user's friend list first before global users
-        
         const data = await db.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
-        
         res.send({ status: 'success', data: data.rows })
 
         //TODO: code search order for live search. 
-        //first friends' firstname, then lastname, then other people etc.
+        //first friends' firstname, then lastname, then other people, then posts etc etc.
     } catch (error) {
         console.log(error)
         res.status(500).send({ status: 'error' })
     }
-
-
 })
 
-//ALL SEARCH RESULTS
+//FRIEND LIVE SEARCH RESULTS; while person types
+searchRouter.get('/friend-search/:searchKey', async (req, res) => {
+
+    const key = req.params.searchKey.trim()
+
+    try {
+        const data = await db.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
+        res.send({ status: 'success', data: data.rows })
+
+        //TODO: code search order for live search. 
+        //first friends' firstname, then lastname.
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({ status: 'error' })
+    }
+})
+
+
+
+//TODO: ALL SEARCH RESULTS
 //ie when they actually hit enter

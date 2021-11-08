@@ -40,8 +40,6 @@ exports.friendRouter.get('/verify-friend/:friendId', authMiddleware_1.verifyUser
     try {
         const data = yield postgresDb_1.default.query('SELECT * FROM friend where userid=(LEAST($1,$2))::INT and friendid=(GREATEST($1,$2))::INT', [userid, friendid]);
         data.rows.length > 0 ? isFriend = true : isFriend = false;
-        console.log(`userid: ${userid}  friendid: ${friendid}`);
-        console.log(`res ${data.rows}`);
     }
     catch (error) {
         res.status(500).send({ status: "error", message: error });
@@ -116,6 +114,17 @@ exports.friendRouter.post('/request-friend/:friendId', authMiddleware_1.verifyUs
         res.status(500).send({ status: 'error', message: error });
     }
 }));
+//GET FRIEND REQUESTS + Sender details
+exports.friendRouter.get('/friend-requests', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userid = req.userContext.userId;
+    try {
+        const data = yield postgresDb_1.default.query('SELECT person.firstname, person.lastname,person.userid FROM friendrequest INNER JOIN person ON friendrequest.requesterid = person.userid WHERE friendrequest.receiverid = $1', [userid]);
+        res.status(200).send({ status: 'success', data: data.rows });
+    }
+    catch (error) {
+        res.status(500).send({ status: 'error', message: error });
+    }
+}));
 //GET FRIEND DATA
 exports.friendRouter.get('/friend/:friendId', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let isFriend;
@@ -129,13 +138,13 @@ exports.friendRouter.get('/friend/:friendId', authMiddleware_1.verifyUserAuth, (
         res.status(500).send({ status: 'error', message: error });
     }
 }));
-//GET FRIEND REQUESTS + Sender details
-exports.friendRouter.get('/friend-requests', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+//GET ALL FRIENDS 
+exports.friendRouter.get('/friends', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userid = req.userContext.userId;
     try {
-        const data = yield postgresDb_1.default.query('SELECT person.firstname, person.lastname,person.userid FROM friendrequest INNER JOIN person ON friendrequest.requesterid = person.userid WHERE friendrequest.receiverid = $1', [userid]);
+        const data = yield postgresDb_1.default.query('SELECT person.email, person.firstname, person.lastname, person.userid FROM friend INNER JOIN person ON friend.friendid = person.userid WHERE friend.userid = $1', [userid]);
+        console.log(data.rows);
         res.status(200).send({ status: 'success', data: data.rows });
-        console.log(data);
     }
     catch (error) {
         res.status(500).send({ status: 'error', message: error });

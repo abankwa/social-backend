@@ -27,20 +27,33 @@ exports.searchRouter.use((0, cors_1.default)({
 exports.searchRouter.use((0, cookie_parser_1.default)());
 //parse request body as json
 exports.searchRouter.use(express_1.default.json());
-//LIVE SEARCH RESULTS; while person types
-exports.searchRouter.get('/live-search/:searchKey', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+//GLOBAL LIVE SEARCH RESULTS; while person types
+exports.searchRouter.get('/global-search/:searchKey', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const key = req.params.searchKey.trim();
     try {
-        //TODO: search from user's friend list first before global users
         const data = yield postgresDb_1.default.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
         res.send({ status: 'success', data: data.rows });
         //TODO: code search order for live search. 
-        //first friends' firstname, then lastname, then other people etc.
+        //first friends' firstname, then lastname, then other people, then posts etc etc.
     }
     catch (error) {
         console.log(error);
         res.status(500).send({ status: 'error' });
     }
 }));
-//ALL SEARCH RESULTS
+//FRIEND LIVE SEARCH RESULTS; while person types
+exports.searchRouter.get('/friend-search/:searchKey', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const key = req.params.searchKey.trim();
+    try {
+        const data = yield postgresDb_1.default.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
+        res.send({ status: 'success', data: data.rows });
+        //TODO: code search order for live search. 
+        //first friends' firstname, then lastname.
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).send({ status: 'error' });
+    }
+}));
+//TODO: ALL SEARCH RESULTS
 //ie when they actually hit enter
