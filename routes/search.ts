@@ -27,7 +27,7 @@ searchRouter.get('/global-search/:searchKey', async (req, res) => {
     const key = req.params.searchKey.trim()
 
     try {
-        const data = await db.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
+        const data = await db.query(`SELECT firstname, lastname, userid FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
         res.send({ status: 'success', data: data.rows })
 
         //TODO: code search order for live search. 
@@ -44,7 +44,7 @@ searchRouter.get('/friend-search/:searchKey', async (req, res) => {
     const key = req.params.searchKey.trim()
 
     try {
-        const data = await db.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
+        const data = await db.query(`SELECT firstname, lastname, userid FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`])
         res.send({ status: 'success', data: data.rows })
 
         //TODO: code search order for live search. 

@@ -31,7 +31,7 @@ exports.searchRouter.use(express_1.default.json());
 exports.searchRouter.get('/global-search/:searchKey', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const key = req.params.searchKey.trim();
     try {
-        const data = yield postgresDb_1.default.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
+        const data = yield postgresDb_1.default.query(`SELECT firstname, lastname, userid FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
         res.send({ status: 'success', data: data.rows });
         //TODO: code search order for live search. 
         //first friends' firstname, then lastname, then other people, then posts etc etc.
@@ -45,7 +45,7 @@ exports.searchRouter.get('/global-search/:searchKey', (req, res) => __awaiter(vo
 exports.searchRouter.get('/friend-search/:searchKey', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const key = req.params.searchKey.trim();
     try {
-        const data = yield postgresDb_1.default.query(`SELECT * FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
+        const data = yield postgresDb_1.default.query(`SELECT firstname, lastname, userid FROM Person WHERE firstname LIKE $1 ORDER BY firstname ASC LIMIT 10`, [`%${key}%`]);
         res.send({ status: 'success', data: data.rows });
         //TODO: code search order for live search. 
         //first friends' firstname, then lastname.
