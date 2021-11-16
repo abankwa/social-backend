@@ -43,7 +43,7 @@ app.use((req, res, next) => {
     req.io = io;
     return next();
 });
-const port = process.env.SERVER_PORT || "3000";
+const port = process.env.SERVER_PORT || "4000";
 app.use('/api', post_1.postRouter);
 app.use('/auth', signup_1.signupRouter);
 app.use('/auth', signin_1.signInRouter);

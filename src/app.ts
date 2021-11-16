@@ -49,7 +49,7 @@ app.use((req, res, next) => {
   
 
 
-const port: String = process.env.SERVER_PORT || "3000";
+const port: String = process.env.SERVER_PORT || "4000";
 
 app.use('/api', postRouter)
 
