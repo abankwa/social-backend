@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express, { Router } from 'express'
 import { generateUploadURL, deleteS3Object} from '../middleware/awsS3'
 import cors from 'cors'

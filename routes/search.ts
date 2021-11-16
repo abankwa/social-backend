@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express, { Router } from 'express'
 import db from '../models/postgresDb'
 import { verifyUserAuth } from '../middleware/authMiddleware'

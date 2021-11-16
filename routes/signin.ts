@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express, { Router } from 'express'
 import connectDb from '../models/connectDb'
 import bcrypt from 'bcrypt'

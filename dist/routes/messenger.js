@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.messengerRouter = void 0;
+// @ts-nocheck
 const express_1 = __importDefault(require("express"));
 const postgresDb_1 = __importDefault(require("../models/postgresDb"));
 const authMiddleware_1 = require("../middleware/authMiddleware");

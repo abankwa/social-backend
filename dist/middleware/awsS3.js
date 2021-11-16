@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteS3Object = exports.generateUploadURL = void 0;
+// @ts-nocheck
 const aws_sdk_1 = __importDefault(require("aws-sdk"));
 const crypto_1 = require("crypto");
 const s3 = new aws_sdk_1.default.S3({

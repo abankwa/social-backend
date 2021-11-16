@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import mongoose, { mongo } from 'mongoose'
 
 let isConnected: Boolean = false;

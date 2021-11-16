@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import aws, { S3 } from 'aws-sdk'
 import crypto, { randomBytes } from 'crypto'
 

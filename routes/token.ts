@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from 'express'
 import connectDb from '../models/connectDb'
 import jwt from 'jsonwebtoken'

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import jwt from 'jsonwebtoken'
 require('dotenv').config()
 import jwtDecode from 'jwt-decode'
