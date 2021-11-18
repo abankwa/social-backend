@@ -8,5 +8,5 @@ else
     mkdir $DIR
 fi
 
-sudo chmod -R 777 $DIR
+#sudo chmod -R 777 $DIR
 
