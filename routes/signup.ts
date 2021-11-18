@@ -41,7 +41,6 @@ signupRouter.post('/signup', async (req, res) => {
     
     const { email, password, firstName, lastName } = req.body
 
-    console.log(req.body)
     //verify email is not already in use
     //const data = await User.findOne({ email: req.body.email })// MONGO
     const data = await db.query('SELECT * FROM Person WHERE email=$1', [email])

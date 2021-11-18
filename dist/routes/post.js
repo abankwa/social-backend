@@ -59,7 +59,6 @@ exports.postRouter.post('/post', authMiddleware_1.verifyUserAuth, (req, res) => 
         const { postText, personId, mediaURL } = req.body;
         const data = yield postgresDb_1.default.query('INSERT INTO Post (postText, personId, mediaUrl) VALUES ($1,$2,$3)', [postText, personId, mediaURL]);
         res.status(201).send({ status: 'success' });
-        console.log('success');
     }
     catch (error) {
         res.status(500).send({ status: 'error', error });
@@ -73,7 +72,6 @@ exports.postRouter.delete('/post', authMiddleware_1.verifyUserAuth, (req, res) =
     try {
         //delete post from database
         const { personid, postid } = req.body;
-        console.log(req.body);
         const data = yield postgresDb_1.default.query('DELETE FROM Post WHERE postid=$1 AND personid=$2', [postid, personid]);
         //delete image from S3 
         const out = (0, awsS3_1.deleteS3Object)(req.body.mediaurl.split('/')[3]);

@@ -28,18 +28,15 @@ messengerRouter.post('/conversation-given-members', verifyUserAuth, async (req, 
     const participants = [...req.body.data, userid]
     const count = participants.length
 
-    console.log(participants)
 
     try {
         //get the single conversationid that these participant are a part of
         const data1 = await db.query(`select conversationid from conversation_participant where participantid = ANY($1::int[]) group by conversationid having count(conversationid) = $2`, [participants, count])
-        console.log(data1.rows)
 
         //check the number of participants in this conversation
 
         if (data1.rows.length > 0) {
             const data2 = await db.query('select count(*) from conversation_participant where conversationid = $1', [data1.rows[0].conversationid])
-            console.log(data2.rows)
             //confirm that these participants are the only people in the conversation. prevents matching of conversations where participants are only a subset
             if (parseInt(data2.rows[0].count) === count) res.send({ status: 'success', data: data1.rows })
             else res.send({ status: 'success', data: [] })
@@ -83,7 +80,6 @@ messengerRouter.post('/message', verifyUserAuth, async (req, res) => {
 
     //req.io.emit('chat','yolo bitcheees!')
 
-    console.log(req.params)
    try {
        const data = await db.query('insert into chatmessage(conversationid, senderid, messagetext) values($1,$2,$3)',[conversationid,userid,messagetext])
        res.status(201).send({status: 'success', data: data.rows})
@@ -96,7 +92,6 @@ messengerRouter.post('/message', verifyUserAuth, async (req, res) => {
 messengerRouter.post('/conversation-with-message', verifyUserAuth, async (req, res) => {
 
     const userid = req.userContext.userId
-    console.log(req.body)
     const members = [...req.body.chatMembers,userid]
     const message = req.body.messagetext
 

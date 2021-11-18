@@ -165,7 +165,6 @@ friendRouter.get('/friends', verifyUserAuth, async (req, res) => {
     
     try {
         const data = await db.query('SELECT person.email, person.firstname, person.lastname, person.userid FROM friend INNER JOIN person ON friend.friendid = person.userid WHERE friend.userid = $1',[userid])
-        console.log(data.rows)
         res.status(200).send({status: 'success', data:data.rows })
     } catch (error) {
         res.status(500).send({status: 'error', message: error})

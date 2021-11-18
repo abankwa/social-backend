@@ -51,7 +51,6 @@ postRouter.post('/post', verifyUserAuth, async (req, res) => {
         const { postText, personId, mediaURL } = req.body
         const data = await db.query('INSERT INTO Post (postText, personId, mediaUrl) VALUES ($1,$2,$3)', [postText, personId, mediaURL])
         res.status(201).send({ status: 'success' })
-        console.log('success')
     } catch (error) {
         res.status(500).send({ status: 'error', error })
         console.log(error)
@@ -66,14 +65,12 @@ postRouter.delete('/post', verifyUserAuth, async (req, res) => {
     try {
         //delete post from database
         const { personid, postid} = req.body
-        console.log(req.body)
         const data = await db.query('DELETE FROM Post WHERE postid=$1 AND personid=$2',[postid,personid])
 
         //delete image from S3 
         const out = deleteS3Object(req.body.mediaurl.split('/')[3])
         res.status(200).send({status: 'success'})
     } catch(error){
-        console.log(error)
         res.status(500).send({status: 'error', error})
     }
 })

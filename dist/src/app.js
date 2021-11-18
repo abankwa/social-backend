@@ -34,7 +34,6 @@ const io = new socket_io_1.Server(server, {
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on("chat", (data) => {
-        console.log(data);
         socket.emit("chat", "Hey!");
     });
 });

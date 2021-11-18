@@ -144,7 +144,6 @@ exports.friendRouter.get('/friends', authMiddleware_1.verifyUserAuth, (req, res)
     const userid = req.userContext.userId;
     try {
         const data = yield postgresDb_1.default.query('SELECT person.email, person.firstname, person.lastname, person.userid FROM friend INNER JOIN person ON friend.friendid = person.userid WHERE friend.userid = $1', [userid]);
-        console.log(data.rows);
         res.status(200).send({ status: 'success', data: data.rows });
     }
     catch (error) {

@@ -17,14 +17,12 @@ const mongoose_1 = __importDefault(require("mongoose"));
 let isConnected = false;
 function connectDb() {
     return __awaiter(this, void 0, void 0, function* () {
-        //if (isConnected) {console.log('db already connected');return}
         try {
             const db = yield mongoose_1.default.connect(process.env.MONGO_URI, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
             });
             isConnected = true;
-            //console.log('db connected')
         }
         catch (error) {
             console.log(error);

@@ -17,7 +17,6 @@ import { socketRouter } from '../routes/socket'
 import http from 'http'
 import { Server } from 'socket.io'
 
-console.log('new deploy')
 //connect to db
 connectDb();
 const app = express()
@@ -36,7 +35,6 @@ io.on('connection', (socket) => {
     console.log('a user connected');
 
     socket.on("chat", (data) => {
-        console.log(data);
         socket.emit("chat", "Hey!")
     });
 });
