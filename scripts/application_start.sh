@@ -12,8 +12,8 @@ sudo chmod -R 777 /home/ec2-user/social-backend
 
 # update environment variables
 # these must be set on the node separately, together with all other stuff nginx, postgres, etc
-cat env.sh | sudo tee -a ~/.bashrc 
-source ~/.bashrc
+# cat env.sh | sudo tee -a ~/.bashrc 
+# source ~/.bashrc
 
 #install node modules
 #npm ci
