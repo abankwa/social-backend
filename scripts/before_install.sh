@@ -8,6 +8,7 @@ else
     mkdir $DIR
 fi
 
-sudo chown ec2-user /home/ec2-user/social-backend
-sudo chmod -R 777 $DIR
+#this doesn't work here; only works in ApplicationStart hook
+#sudo chown ec2-user /home/ec2-user/social-backend
+#sudo chmod -R 777 $DIR
 

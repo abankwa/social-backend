@@ -15,6 +15,8 @@ sudo chmod -R 777 /home/ec2-user/social-backend
 
 
 #reload app
+#TODO add script to check if backend is already running, if so do a reload instead of
+#deleting and starting
 cd /home/ec2-user/social-backend/dist/src
 pm2 delete backend
 pm2 start /home/ec2-user/social-backend/dist/src/app.js --name backend
