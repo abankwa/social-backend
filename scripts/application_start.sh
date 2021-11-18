@@ -10,8 +10,9 @@ export NVM_DIR="$HOME/.nvm"
 sudo chown ec2-user /home/ec2-user/social-backend
 sudo chmod -R 777 /home/ec2-user/social-backend
 
-#update environment variables
-cat .env | sudo tee -a ~/.bashrc 
+# update environment variables
+# these must be set on the node separately, together with all other stuff nginx, postgres, etc
+cat env.sh | sudo tee -a ~/.bashrc 
 source ~/.bashrc
 
 #install node modules

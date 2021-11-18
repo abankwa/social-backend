@@ -1,4 +1,3 @@
-#!/bin/bash
 
 export MONGO_URI=mongodb+srv://user1:z72QeBA1jMdY9JHS@cluster0.zk4nw.mongodb.net/db-auth?retryWrites=true&w=majority
 export SERVER_PORT=4000
