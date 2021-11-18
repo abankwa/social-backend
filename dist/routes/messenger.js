@@ -34,15 +34,12 @@ exports.messengerRouter.post('/conversation-given-members', authMiddleware_1.ver
     const userid = req.userContext.userId;
     const participants = [...req.body.data, userid];
     const count = participants.length;
-    
     try {
         //get the single conversationid that these participant are a part of
         const data1 = yield postgresDb_1.default.query(`select conversationid from conversation_participant where participantid = ANY($1::int[]) group by conversationid having count(conversationid) = $2`, [participants, count]);
-    
         //check the number of participants in this conversation
         if (data1.rows.length > 0) {
             const data2 = yield postgresDb_1.default.query('select count(*) from conversation_participant where conversationid = $1', [data1.rows[0].conversationid]);
-        
             //confirm that these participants are the only people in the conversation. prevents matching of conversations where participants are only a subset
             if (parseInt(data2.rows[0].count) === count)
                 res.send({ status: 'success', data: data1.rows });

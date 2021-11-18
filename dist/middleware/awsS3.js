@@ -27,7 +27,6 @@ function generateUploadURL() {
     return __awaiter(this, void 0, void 0, function* () {
         const rawBytes = yield (0, crypto_1.randomBytes)(16);
         const imageName = rawBytes.toString('hex');
-    
         const params = {
             Bucket: 'bhanks',
             Key: `${imageName}.jpg`,
