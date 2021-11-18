@@ -11,7 +11,7 @@ sudo chown ec2-user /home/ec2-user/social-backend
 sudo chmod -R 777 /home/ec2-user/social-backend
 
 #install node modules
-npm ci
+#npm ci
 
 
 #reload app
