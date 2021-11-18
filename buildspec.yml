@@ -12,7 +12,7 @@ phases:
   build:
     commands:
       - echo starting build ...
-      - tsc
+      - npm run build
   post_build:
     commands:
       - echo build completed
