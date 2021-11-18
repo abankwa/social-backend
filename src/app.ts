@@ -17,7 +17,7 @@ import { socketRouter } from '../routes/socket'
 import http from 'http'
 import { Server } from 'socket.io'
 
-
+console.log('new deploy')
 //connect to db
 connectDb();
 const app = express()
