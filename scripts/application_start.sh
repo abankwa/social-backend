@@ -11,7 +11,8 @@ sudo chown ec2-user /home/ec2-user/social-backend
 sudo chmod -R 777 /home/ec2-user/social-backend
 
 #update environment variables
-source env.sh
+cat .env | sudo tee -a ~/.bashrc 
+source ~/.bashrc
 
 #install node modules
 #npm ci
