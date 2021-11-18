@@ -5,18 +5,15 @@ phases:
     runtime-version:
       nodejs: 14
   pre_build:
-    run-as: ec2-user
     commands:
       - echo installing dependencies...
       - npm install
       - npm install tsc
   build:
-    run-as: ec2-user
     commands:
       - echo starting build ...
       - tsc
   post_build:
-    run-as: ec2-user
     commands:
       - echo build completed
 
