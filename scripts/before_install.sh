@@ -8,5 +8,6 @@ else
     mkdir $DIR
 fi
 
-#sudo chmod -R 777 $DIR
+sudo chown ec2-user
+sudo chmod -R 777 $DIR
 
