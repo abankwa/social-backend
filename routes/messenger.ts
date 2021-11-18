@@ -54,11 +54,10 @@ messengerRouter.post('/conversation-given-members', verifyUserAuth, async (req, 
 //GET MESSAGES GIVEN A CONVERSATION ID
 messengerRouter.get('/messages/:conversationid', verifyUserAuth, async (req, res) => {
     const userid = req.userContext.userId
-    console.log('testing here.again..')
 
     try {
         const data = await db.query('select * from chatmessage where conversationid = $1', [req.params.conversationid])
-        console.log(data.rows)
+
         res.status(200).send({ status: 'success', data: data.rows })
     } catch (error) {
         res.status(500).send({ status: 'error', message: error })
