@@ -2,8 +2,13 @@
 
 cd /home/ec2-user/social-backend
 
-#add npm and node to path
+#add npm and node to path for ec2-user
 export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ]  && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+#add npm and node to path for root
+sudo export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ]  && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
