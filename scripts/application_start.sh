@@ -17,7 +17,7 @@ sudo chmod -R 777 /home/ec2-user/social-backend
 #reload app
 cd /home/ec2-user/social-backend/dist/src
 pm2 delete backend
-pm2 start app.js --name backend
+pm2 start /home/ec2-user/social-backend/dist/src/app.js --name backend
 
 
 
