@@ -13,12 +13,12 @@ sudo export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 #install node modules
-npm ci
+sudo npm ci
 
 
 #reload app
 cd /home/ec2-user/social-backend/dist/src
-pm2 start app.js --name backend
+sudo pm2 start app.js --name backend
 
 
 
