@@ -3,6 +3,13 @@ os: linux
 files:
   - source: /
     destination: /home/ec2-user/social-backend
+permissions:
+  - object: /home/ec2-user/social-backend
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    type:
+      - directory
 hooks:
   ApplicationStop: 
     - location: scripts/application_stop.sh
