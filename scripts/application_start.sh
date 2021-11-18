@@ -6,5 +6,8 @@ cd /home/ec2-user/social-backend
 npm ci
 
 #reload app
-pm2 reload backend
+cd /home/ec2-user/social-backend/dist/src
+pm2 start app.js --name backend
+
+
 
