@@ -12,6 +12,10 @@ import { searchRouter } from '../routes/search'
 import { friendRouter } from '../routes/friend'
 import { messengerRouter } from '../routes/messenger'
 import { socketRouter } from '../routes/socket'
+import WebSocket from 'ws'
+import { v4 as uuidv4 } from 'uuid';
+
+
 
 //socket.io stuff
 import http from 'http'
@@ -31,19 +35,36 @@ const io = new Server(server, {
     }
 })
 
+//const wss = new WebSocket.Server({server})
+
 io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.emit("chat", {text: 'yolooo',type:'in',id: uuidv4()})
+    socket.join("room1");
 
     socket.on("chat", (data) => {
-        socket.emit("chat", "Hey!")
+        //socket.emit("chat", {...data,type:'in',id: uuidv4()})
+        socket.to('room1').emit("chat", {...data,type:'in',id: uuidv4()})
+        console.log(data)
     });
 });
+
+// wss.on('connection',(ws) => {
+//     //console('new connection bitches')
+//     ws.send('new websocket bitches')
+
+// })
 
 //pass socket io to express routers
 app.use((req, res, next) => {
     req.io = io;
     return next();
 });
+
+// app.use((req,res,next) => {
+//     req.wss = wss;
+//     return next();
+// })
   
 
 

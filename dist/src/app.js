@@ -16,6 +16,7 @@ const search_1 = require("../routes/search");
 const friend_1 = require("../routes/friend");
 const messenger_1 = require("../routes/messenger");
 const socket_1 = require("../routes/socket");
+const uuid_1 = require("uuid");
 //socket.io stuff
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
@@ -31,17 +32,30 @@ const io = new socket_io_1.Server(server, {
         credentials: true
     }
 });
+//const wss = new WebSocket.Server({server})
 io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.emit("chat", { text: 'yolooo', type: 'in', id: (0, uuid_1.v4)() });
+    socket.join("room1");
     socket.on("chat", (data) => {
-        socket.emit("chat", "Hey!");
+        //socket.emit("chat", {...data,type:'in',id: uuidv4()})
+        socket.to('room1').emit("chat", Object.assign(Object.assign({}, data), { type: 'in', id: (0, uuid_1.v4)() }));
+        console.log(data);
     });
 });
+// wss.on('connection',(ws) => {
+//     //console('new connection bitches')
+//     ws.send('new websocket bitches')
+// })
 //pass socket io to express routers
 app.use((req, res, next) => {
     req.io = io;
     return next();
 });
+// app.use((req,res,next) => {
+//     req.wss = wss;
+//     return next();
+// })
 const port = process.env.SERVER_PORT || "4000";
 app.use('/api', post_1.postRouter);
 app.use('/auth', signup_1.signupRouter);

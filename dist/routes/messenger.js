@@ -66,8 +66,21 @@ exports.messengerRouter.get('/messages/:conversationid', authMiddleware_1.verify
 }));
 //GET ALL CONVERSATIONS
 exports.messengerRouter.get('/conversations', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userid = req.userContext.userId;
     try {
-        const data = yield postgresDb_1.default.query('select * from conversation', []);
+        const data = yield postgresDb_1.default.query('select * from conversation_participant where participantid = $1', [userid]);
+        res.status(200).send({ status: 'success', data: data.rows });
+    }
+    catch (error) {
+        res.status(500).send({ status: 'error', message: error });
+    }
+}));
+//GET ALL CONVERSATION PARTICIPANTS
+exports.messengerRouter.get('/participants/:conversationid', authMiddleware_1.verifyUserAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const conversationid = req.params.conversationid;
+    try {
+        const data = yield postgresDb_1.default.query('select  person.firstname, person.lastname, person.email, person.userid from conversation_participant inner join person on  conversation_participant.participantid = person.userid where conversation_participant.conversationid = $1', [conversationid]);
+        console.log(data.rows);
         res.status(200).send({ status: 'success', data: data.rows });
     }
     catch (error) {
@@ -80,7 +93,7 @@ exports.messengerRouter.post('/message', authMiddleware_1.verifyUserAuth, (req, 
     const { conversationid, messagetext } = req.body;
     //req.io.emit('chat','yolo bitcheees!')
     try {
-        const data = yield postgresDb_1.default.query('insert into chatmessage(conversationid, senderid, messagetext) values($1,$2,$3)', [conversationid, userid, messagetext]);
+        const data = yield postgresDb_1.default.query('insert into chatmessage(conversationid, senderid, messagetext) values($1,$2,$3) returning messageid, messagedate, senderid, conversationid, messagetext', [conversationid, userid, messagetext]);
         res.status(201).send({ status: 'success', data: data.rows });
     }
     catch (error) {
@@ -97,13 +110,15 @@ exports.messengerRouter.post('/conversation-with-message', authMiddleware_1.veri
         //1. create new conversation
         const data1 = yield postgresDb_1.default.query('insert into conversation default values  returning conversationid', []);
         const conversationid = data1.rows[0].conversationid;
+        console.log(conversationid);
         //2. add members to conversation_participant table
         members.map((member) => __awaiter(void 0, void 0, void 0, function* () {
             yield postgresDb_1.default.query('insert into conversation_participant (conversationid,participantid) values($1,$2)', [conversationid, member]);
         }));
         //3. add the message
-        yield postgresDb_1.default.query('insert into chatmessage(conversationid, senderid, messagetext) values($1,$2,$3)', [conversationid, userid, message]);
-        res.status(201).send({ status: 'success', data: data1.rows });
+        const data2 = yield postgresDb_1.default.query('insert into chatmessage(conversationid, senderid, messagetext) values($1,$2,$3) returning messageid, messagedate, senderid, conversationid, messagetext', [conversationid, userid, message]);
+        console.log(data2.rows);
+        res.status(201).send({ status: 'success', data: data2.rows });
     }
     catch (error) {
         res.status(400).send({ status: 'error', message: error });
